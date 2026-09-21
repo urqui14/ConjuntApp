@@ -1,0 +1,64 @@
+body {
+    background-color: #f4f7f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+}
+
+input.form-control {
+    border-radius: 6px;
+}
+
+.btn-simbolo {
+    width: 40px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+/* Estilos para el Plano Cartesiano Visual */
+.plano-cartesiano {
+    display: inline-grid;
+    border-left: 2px solid #000;
+    border-bottom: 2px solid #000;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.punto-cartesiano {
+    width: 10px;
+    height: 10px;
+    background-color: #dc3545;
+    border-radius: 50%;
+    margin: auto;
+    position: relative;
+}
+
+.etiqueta-punto {
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    font-size: 0.75rem;
+    color: #333;
+    white-space: nowrap;
+}
+
+.eje-y-label {
+    text-align: right;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+.eje-x-label {
+    text-align: center;
+    padding-top: 10px;
+    font-weight: bold;
+}
