@@ -12,9 +12,29 @@ const botonesSimbolos = document.querySelectorAll('.btn-simbolo');
 const listaPasosUI = document.getElementById('listaPasos');
 const resultadoFinalUI = document.getElementById('resultadoFinal');
 const zonaGrafica = document.getElementById('zonaGrafica');
-// Forzar mayúsculas automáticamente en la caja de expresión
+
+// Validación de entrada, atajos de teclado y mayúsculas
 inputExpresion.addEventListener('input', function() {
-    this.value = this.value.toUpperCase();
+    let texto = this.value.toUpperCase();
+    
+    // 1. Eliminar cualquier carácter que NO sea válido (incluye números y otras letras)
+    // Solo permite: A, B, C, U, N, D, 0, paréntesis, espacios y los símbolos matemáticos
+    texto = texto.replace(/[^ABCU∩\-Δ'Ø()ND0\s]/g, '');
+    
+    // 2. Reemplazar los atajos por símbolos
+    texto = texto.replace(/N/g, '∩'); 
+    texto = texto.replace(/D/g, 'Δ'); 
+    texto = texto.replace(/0/g, 'Ø'); 
+    
+    this.value = texto;
+});
+
+// Evaluar automáticamente al presionar la tecla Enter
+inputExpresion.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Evita recargas inesperadas
+        btnEvaluar.click();     // Simula un clic en el botón "Evaluar"
+    }
 });
 
 botonesSimbolos.forEach(boton => {
