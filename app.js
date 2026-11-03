@@ -1,6 +1,4 @@
-// ==========================================
 // 1. CAPTURA DE ELEMENTOS
-// ==========================================
 const inputU = document.getElementById('inputU');
 const inputA = document.getElementById('inputA');
 const inputB = document.getElementById('inputB');
@@ -44,9 +42,7 @@ botonesSimbolos.forEach(boton => {
     });
 });
 
-// ==========================================
 // 2. OPERACIONES Y LÓGICA DE CONJUNTOS
-// ==========================================
 function crearConjunto(texto) {
     const elementos = texto.split(',').map(item => item.trim()).filter(item => item !== "" && item !== "Ø");
     return new Set(elementos);
@@ -64,9 +60,7 @@ function imprimirConjunto(conjunto) {
     return "{ " + [...conjunto].join(", ") + " }";
 }
 
-// ==========================================
 // 3. CONJUNTO POTENCIA (2^N)
-// ==========================================
 function generarPotencia(arreglo) {
     const result = [[]]; // El vacío siempre inicia
     for (let value of arreglo) {
@@ -100,9 +94,7 @@ window.calcularPotenciaUI = function(nombreConjunto) {
     `;
 };
 
-// ==========================================
 // 4. MOTOR EVALUADOR DE EXPRESIONES 
-// ==========================================
 function evaluarOperacionSimple(op, setA, setB, setU) {
     switch (op) {
         case 'U': return union(setA, setB);
@@ -185,93 +177,96 @@ btnEvaluar.addEventListener('click', () => {
     }
 });
 
-// ==========================================
-// 5. PRODUCTO CARTESIANO Y GRÁFICOS (Canvas + CSS Grid)
-// ==========================================
+// 5. PRODUCTO CARTESIANO Y GRÁFICOS (Dinámico con Menús)
 btnCartesiano.addEventListener('click', () => {
-    const arrA = Array.from(crearConjunto(inputA.value));
-    const arrB = Array.from(crearConjunto(inputB.value));
+    // Leer los selects dinámicamente
+    const sel1 = document.getElementById('selectCart1').value;
+    const sel2 = document.getElementById('selectCart2').value;
     
-    if (arrA.length === 0 || arrB.length === 0) return alert("A y B deben tener elementos.");
+    // Asignar el input correspondiente según la selección del usuario
+    let input1 = (sel1 === 'A') ? inputA : (sel1 === 'B') ? inputB : inputC;
+    let input2 = (sel2 === 'A') ? inputA : (sel2 === 'B') ? inputB : inputC;
+
+    const arr1 = Array.from(crearConjunto(input1.value));
+    const arr2 = Array.from(crearConjunto(input2.value));
+    
+    if (arr1.length === 0 || arr2.length === 0) return alert(`Los conjuntos ${sel1} y ${sel2} deben tener elementos.`);
 
     zonaGrafica.classList.remove('d-none');
-    resultadoFinalUI.innerHTML = `Producto Cartesiano (A × B)`;
+    resultadoFinalUI.innerHTML = `Producto Cartesiano (${sel1} × ${sel2})`;
     
     let pares = [];
-    arrA.forEach(a => arrB.forEach(b => pares.push(`(${a}, ${b})`)));
+    arr1.forEach(a => arr2.forEach(b => pares.push(`(${a}, ${b})`)));
 
     listaPasosUI.innerHTML = `
-        <li class="list-group-item"><strong>Cardinalidad:</strong> |A × B| = ${arrA.length} × ${arrB.length} = ${pares.length} pares.</li>
+        <li class="list-group-item"><strong>Cardinalidad:</strong> |${sel1} × ${sel2}| = ${arr1.length} × ${arr2.length} = ${pares.length} pares.</li>
         <li class="list-group-item text-muted">${pares.join(' ; ')}</li>
     `;
 
-    dibujarDiagramaRelacional(arrA, arrB);
-    dibujarPlanoCartesiano(arrA, arrB);
+    dibujarDiagramaRelacional(arr1, arr2, sel1, sel2);
+    dibujarPlanoCartesiano(arr1, arr2);
 });
 
-function dibujarDiagramaRelacional(arrA, arrB) {
+function dibujarDiagramaRelacional(arr1, arr2, nombre1, nombre2) {
     const canvas = document.getElementById('canvasRelacional');
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia trazos anteriores
 
-    // Coordenadas de los óvalos
     const xA = 100, xB = 300, yCentro = 100, radioY = 80, radioX = 40;
 
     // Dibujar Óvalos
     ctx.strokeStyle = '#000';
     ctx.beginPath(); ctx.ellipse(xA, yCentro, radioX, radioY, 0, 0, 2 * Math.PI); ctx.stroke();
     ctx.beginPath(); ctx.ellipse(xB, yCentro, radioX, radioY, 0, 0, 2 * Math.PI); ctx.stroke();
-    ctx.font = "16px Arial"; ctx.fillText("A", xA - 5, 15); ctx.fillText("B", xB - 5, 15);
+    ctx.font = "16px Arial"; 
+    ctx.fillText(nombre1, xA - 5, 15); 
+    ctx.fillText(nombre2, xB - 5, 15);
 
     // Posiciones de los puntos
-    const puntosA = arrA.map((val, i) => ({ val, x: xA, y: yCentro - radioY + 30 + (i * 120 / (arrA.length || 1)) }));
-    const puntosB = arrB.map((val, i) => ({ val, x: xB, y: yCentro - radioY + 30 + (i * 120 / (arrB.length || 1)) }));
+    const puntos1 = arr1.map((val, i) => ({ val, x: xA, y: yCentro - radioY + 30 + (i * 120 / (arr1.length || 1)) }));
+    const puntos2 = arr2.map((val, i) => ({ val, x: xB, y: yCentro - radioY + 30 + (i * 120 / (arr2.length || 1)) }));
 
     // Trazar las líneas del producto cruzado
     ctx.strokeStyle = 'rgba(220, 53, 69, 0.5)'; // Color rojo translúcido
-    puntosA.forEach(pA => {
-        puntosB.forEach(pB => {
-            ctx.beginPath(); ctx.moveTo(pA.x + 10, pA.y); ctx.lineTo(pB.x - 10, pB.y); ctx.stroke();
+    puntos1.forEach(p1 => {
+        puntos2.forEach(p2 => {
+            ctx.beginPath(); ctx.moveTo(p1.x + 10, p1.y); ctx.lineTo(p2.x - 10, p2.y); ctx.stroke();
         });
     });
 
     // Dibujar textos
     ctx.fillStyle = '#000';
-    puntosA.forEach(p => ctx.fillText(p.val, p.x - 10, p.y + 5));
-    puntosB.forEach(p => ctx.fillText(p.val, p.x - 10, p.y + 5));
+    puntos1.forEach(p => ctx.fillText(p.val, p.x - 10, p.y + 5));
+    puntos2.forEach(p => ctx.fillText(p.val, p.x - 10, p.y + 5));
 }
 
-function dibujarPlanoCartesiano(arrA, arrB) {
+function dibujarPlanoCartesiano(arr1, arr2) {
     const contenedor = document.getElementById('contenedorPlanoCartesiano');
     
-    // Configurar el Grid de CSS dinámicamente
-    let htmlGrid = `<div class="plano-cartesiano" style="grid-template-columns: 40px repeat(${arrA.length}, 60px); grid-template-rows: repeat(${arrB.length}, 60px) 40px;">`;
+    // Configurar el Grid de CSS dinámicamente y reemplazar contenido anterior
+    let htmlGrid = `<div class="plano-cartesiano" style="grid-template-columns: 40px repeat(${arr1.length}, 60px); grid-template-rows: repeat(${arr2.length}, 60px) 40px;">`;
 
-    // Filas (De arriba hacia abajo, eje Y inverso)
-    for (let i = arrB.length - 1; i >= 0; i--) {
-        htmlGrid += `<div class="eje-y-label align-self-center">${arrB[i]}</div>`; // Etiqueta Y
-        for (let j = 0; j < arrA.length; j++) {
+    for (let i = arr2.length - 1; i >= 0; i--) {
+        htmlGrid += `<div class="eje-y-label align-self-center">${arr2[i]}</div>`;
+        for (let j = 0; j < arr1.length; j++) {
             htmlGrid += `<div class="d-flex align-items-center justify-content-center border-bottom border-start border-light">
                             <div class="punto-cartesiano">
-                                <span class="etiqueta-punto">(${arrA[j]}, ${arrB[i]})</span>
+                                <span class="etiqueta-punto">(${arr1[j]}, ${arr2[i]})</span>
                             </div>
                          </div>`;
         }
     }
 
-    // Fila inferior para etiquetas del Eje X
-    htmlGrid += `<div></div>`; // Esquina vacía
-    for (let j = 0; j < arrA.length; j++) {
-        htmlGrid += `<div class="eje-x-label">${arrA[j]}</div>`;
+    htmlGrid += `<div></div>`;
+    for (let j = 0; j < arr1.length; j++) {
+        htmlGrid += `<div class="eje-x-label">${arr1[j]}</div>`;
     }
 
     htmlGrid += `</div>`;
-    contenedor.innerHTML = htmlGrid;
+    contenedor.innerHTML = htmlGrid; // Reemplaza la tabla anterior limpiamente
 }
 
-// ==========================================
 // 6. LIMPIAR INTERFAZ
-// ==========================================
 document.getElementById('btnLimpiar').addEventListener('click', () => {
     inputU.value = ''; inputA.value = ''; inputB.value = ''; inputC.value = ''; inputExpresion.value = '';
     resultadoFinalUI.innerHTML = 'Esperando acción...';
